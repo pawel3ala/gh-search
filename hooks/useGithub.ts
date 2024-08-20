@@ -38,12 +38,14 @@ const useGithub = () => {
     fetch(`${GITHUB_API_URL}/search/repositories?q=${query}`)
       .then((response) => response.json())
       .then((data) => {
-        setResults(data.items.map((item: Repo) => ({
-          name: item?.name,
-          description: item?.description,
-          id: item?.id,
-          owner_avatar_url: item?.owner?.avatar_url,
-        })))
+        setResults(
+          data.items.map((item: Repo) => ({
+            name: item?.name,
+            description: item?.description,
+            id: item?.id,
+            owner_avatar_url: item?.owner?.avatar_url,
+          }))
+        )
       })
       .catch((error) => {
         console.error('Error fetching data: ', error)

@@ -1,6 +1,18 @@
-export type Repository = Nullable<Pick<Repo, "name" | "description" | "id" > & {owner_avatar_url: string}>
+export type Repository = Nullable<
+  Pick<Repo, 'name' | 'description' | 'id'> & { owner_avatar_url: string }
+>
 
-export type RepositoryDetails = Nullable<Pick<Repo, "name" | "description" | "id" | "stargazers_count" | "forks_count" | "watchers_count"  > & {owner_avatar_url: string}>
+export type RepositoryDetails = Nullable<
+  Pick<
+    Repo,
+    | 'name'
+    | 'description'
+    | 'id'
+    | 'stargazers_count'
+    | 'forks_count'
+    | 'watchers_count'
+  > & { owner_avatar_url: string }
+>
 
 export type Nullable<T> = T | null
 
@@ -115,4 +127,3 @@ interface License {
   spdx_id: string
   url: string | null
 }
-

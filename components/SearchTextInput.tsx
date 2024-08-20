@@ -66,5 +66,6 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
+    marginLeft: 10,
   },
 })
