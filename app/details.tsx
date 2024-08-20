@@ -1,60 +1,84 @@
-import { Image, StyleSheet, Platform } from 'react-native'
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
+import { router, useLocalSearchParams, useNavigation } from 'expo-router'
+import { useEffect } from 'react'
+import BackArrowIcon from '@/svg/backArrowIcon'
+import useGithub from '@/hooks/useGithub'
+import VisibilityIcon from '@/svg/visibilityIcon'
+import DetailsRow from '@/components/DetailsRow'
+import StarIcon from '@/svg/starIcon'
+import Branch from '@/svg/branchIcon'
 
-import { HelloWave } from '@/components/HelloWave'
-import ParallaxScrollView from '@/components/ParallaxScrollView'
-import { ThemedText } from '@/components/ThemedText'
-import { ThemedView } from '@/components/ThemedView'
+export default function Details() {
+  const navigation = useNavigation()
+  const { id } = useLocalSearchParams()
 
-export default function HomeScreen() {
+  const { getRepo, isLoading, repo } = useGithub()
+
+  const {
+    name,
+    owner_avatar_url,
+    description,
+    stargazers_count,
+    forks_count,
+    watchers_count,
+  } = repo ?? {}
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: name ?? '',
+      headerLeft: () => {
+        return (
+          <Pressable onPress={() => router.back()}>
+            <BackArrowIcon />
+          </Pressable>
+        )
+      },
+    })
+  }, [id, navigation, name])
+
+  useEffect(() => {
+    getRepo(id)
+  }, [getRepo, id])
+
+  if (isLoading) {
+    return <ActivityIndicator size={'large'} style={styles.activityIndicator} />
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={styles.container}>
+      <Image source={{ uri: owner_avatar_url }} style={styles.image} />
+      <View style={{ paddingHorizontal: 10, gap: 10 }}>
+        <Text>About</Text>
+        <Text>{description}</Text>
+        <DetailsRow title="Forks" count={forks_count || 0} icon={<Branch />} />
+        <View style={styles.separator} />
+        <DetailsRow
+          title="Stars"
+          count={stargazers_count || 0}
+          icon={<StarIcon />}
         />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{' '}
-          to see changes. Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{' '}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{' '}
-          directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <View style={styles.separator} />
+        <DetailsRow
+          title="Watchers"
+          count={watchers_count || 0}
+          icon={<VisibilityIcon />}
+        />
+      </View>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -70,5 +94,24 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  image: {
+    width: '100%',
+    height: 300,
+    borderRadius: 10,
+    borderBottomLeftRadius: 0,
+    borderTopLeftRadius: 0,
+    marginBottom: 20,
+  },
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  separator: {
+    width: '100%',
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'grey',
+    alignSelf: 'center',
   },
 })

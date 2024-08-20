@@ -1,60 +1,62 @@
-import { Image, StyleSheet, Platform } from 'react-native'
+import {
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  View,
+  ListRenderItem,
+} from 'react-native'
 
-import { HelloWave } from '@/components/HelloWave'
-import ParallaxScrollView from '@/components/ParallaxScrollView'
-import { ThemedText } from '@/components/ThemedText'
-import { ThemedView } from '@/components/ThemedView'
+import useGithub from '@/hooks/useGithub'
+import { Repository } from '@/types'
+import { router } from 'expo-router'
+import { useCallback, useState } from 'react'
+import RepoCard from '@/components/RepoCard'
+import EmptyResults from '@/components/EmptyResults'
+import SearchTextInput from '@/components/SearchTextInput'
 
 export default function HomeScreen() {
+  const [input, setInput] = useState('')
+  const { results, isLoading, searchRepos } = useGithub()
+
+  const onPress = useCallback((id: number) => {
+    router.push({ pathname: `/details`, params: { id } })
+  }, [])
+
+  const renderItem: ListRenderItem<Repository> = useCallback(
+    ({ item }) => {
+      return <RepoCard repo={item} onPress={onPress} />
+    },
+    [onPress]
+  )
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={styles.container}>
+      <SearchTextInput
+        input={input}
+        setInput={setInput}
+        onSubmitEditing={() => searchRepos(input)}
+        style={{ marginBottom: 30 }}
+      />
+      {isLoading ? (
+        <ActivityIndicator size={'large'} style={styles.activityIndicator} />
+      ) : (
+        <FlatList
+          contentContainerStyle={{ gap: 10 }}
+          data={results}
+          renderItem={renderItem}
+          ListEmptyComponent={results && <EmptyResults searchInput={input} />}
         />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{' '}
-          to see changes. Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{' '}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{' '}
-          directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      )}
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+    marginTop: 50,
+  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -70,5 +72,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })
