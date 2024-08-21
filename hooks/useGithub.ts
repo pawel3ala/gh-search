@@ -38,6 +38,9 @@ const useGithub = () => {
     fetch(`${GITHUB_API_URL}/search/repositories?q=${query}`)
       .then((response) => response.json())
       .then((data) => {
+        if (!data?.items) {
+          return
+        }
         setResults(
           data.items.map((item: Repo) => ({
             name: item?.name,
