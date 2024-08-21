@@ -15,10 +15,17 @@ import DetailsRow from '@/components/DetailsRow'
 import StarIcon from '@/svg/starIcon'
 import Branch from '@/svg/branchIcon'
 
+const BackButton = () => {
+  return (
+    <Pressable onPress={router.back}>
+      <BackArrowIcon />
+    </Pressable>
+  )
+}
+
 export default function Details() {
   const navigation = useNavigation()
   const { id } = useLocalSearchParams()
-
   const { getRepo, isLoading, repo } = useGithub()
 
   const {
@@ -33,13 +40,7 @@ export default function Details() {
   useEffect(() => {
     navigation.setOptions({
       headerTitle: name ?? '',
-      headerLeft: () => {
-        return (
-          <Pressable onPress={() => router.back()}>
-            <BackArrowIcon />
-          </Pressable>
-        )
-      },
+      headerLeft: BackButton,
     })
   }, [id, navigation, name])
 
@@ -54,7 +55,7 @@ export default function Details() {
   return (
     <View style={styles.container}>
       <Image source={{ uri: owner_avatar_url }} style={styles.image} />
-      <View style={{ paddingHorizontal: 10, gap: 10 }}>
+      <View style={styles.subContainer}>
         <Text>About</Text>
         <Text>{description}</Text>
         <DetailsRow title="Forks" count={forks_count || 0} icon={<Branch />} />
@@ -78,6 +79,10 @@ export default function Details() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  subContainer: {
+    paddingHorizontal: 10,
+    gap: 10,
   },
   titleContainer: {
     flexDirection: 'row',

@@ -35,13 +35,13 @@ export default function HomeScreen() {
         input={input}
         setInput={setInput}
         onSubmitEditing={() => searchRepos(input)}
-        style={{ marginBottom: 30 }}
+        style={styles.textInput}
       />
       {isLoading ? (
         <ActivityIndicator size={'large'} style={styles.activityIndicator} />
       ) : (
         <FlatList
-          contentContainerStyle={{ gap: 10 }}
+          contentContainerStyle={styles.listContainer}
           data={results}
           renderItem={renderItem}
           ListEmptyComponent={results && <EmptyResults searchInput={input} />}
@@ -77,5 +77,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  listContainer: {
+    gap: 10,
+  },
+  textInput: {
+    marginBottom: 30,
   },
 })
